@@ -13,30 +13,34 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
 
-            $user = Auth::user();
+        $user = Auth::user();
 
-            // Redirect berdasarkan role
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-
-            return redirect()->route('home');
+        // Redirect berdasarkan role
+        if ($user->role === 'admin') {
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('success', 'Login admin berhasil');
         }
 
-        return back()->withErrors([
-            'email' => 'Email atau password salah',
-        ]);
+        return redirect()
+            ->route('home')
+            ->with('success', 'Login berhasil. Selamat datang!');
     }
+
+    return back()
+        ->with('error', 'Email atau password salah')
+        ->withInput($request->only('email'));
+}
 
     public function logout(Request $request)
     {
@@ -45,6 +49,9 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect()
+        ->route('home')
+        ->with('success', 'Anda berhasil logout.');
+
     }
 }

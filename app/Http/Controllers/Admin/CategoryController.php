@@ -19,42 +19,46 @@ class CategoryController extends Controller
         return view('admin.categories.create');
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:100',
-        ]);
+  public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required',
+        'role' => 'required|in:top,bottom,outer,shoes,accessory',
+    ]);
 
-        Category::create([
-            'name' => $request->name,
-            'is_active' => true,
-        ]);
+    Category::create([
+        'name' => $request->name,
+        'role' => $request->role,
+        'is_active' => true,
+    ]);
 
-        return redirect()
-            ->route('admin.categories.index')
-            ->with('success', 'Kategori berhasil ditambahkan');
-    }
+    return redirect()->route('admin.categories.index')
+                     ->with('success', 'Kategori berhasil ditambahkan');
+}
+
 
     public function edit(Category $category)
     {
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Category $category)
-    {
-        $request->validate([
-            'name' => 'required|string|max:100',
-        ]);
+   public function update(Request $request, Category $category)
+{
+    $request->validate([
+        'name' => 'required',
+        'role' => 'required|in:top,bottom,outer,shoes,accessory',
+    ]);
 
-        $category->update([
-            'name' => $request->name,
-            'is_active' => $request->has('is_active'),
-        ]);
+    $category->update([
+        'name' => $request->name,
+        'role' => $request->role,
+        'is_active' => $request->has('is_active'),
+    ]);
 
-        return redirect()
-            ->route('admin.categories.index')
-            ->with('success', 'Kategori berhasil diperbarui');
-    }
+    return redirect()->route('admin.categories.index')
+                     ->with('success', 'Kategori berhasil diperbarui');
+}
+
 
     public function destroy(Category $category)
     {

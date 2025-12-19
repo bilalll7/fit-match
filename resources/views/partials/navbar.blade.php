@@ -22,10 +22,14 @@
                 Match Your Outfit
             </a>
 
-            <a href="{{ auth()->check() ? '#' : route('login') }}"
-               class="text-gray-600 hover:text-gray-900">
-                Find Your Outfit
-            </a>
+<a href="{{ auth()->check() ? route('find-outfit.index') : route('login') }}"
+   class="{{ request()->routeIs('find-outfit.*')
+        ? 'text-green-600 border-b-2 border-green-500 pb-1'
+        : 'text-gray-600 hover:text-gray-900' }}">
+    Find Your Outfit
+</a>
+
+
         </div>
 
         {{-- RIGHT SIDE --}}
@@ -51,14 +55,16 @@
         </summary>
 
         <div class="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
-            <form method="POST" action="{{ route('logout') }}">
+            <form id="logoutForm" method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button
-                    type="submit"
-                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+
+                <button type="button"
+                    onclick="confirmLogout()"
+                    class="w-full text-left px-4 py-3 text-red-600 hover:text-red-700">
                     Logout
                 </button>
             </form>
+
         </div>
     </details>
 @endauth
@@ -84,10 +90,15 @@
                         Match Your Outfit
                     </a>
 
-                    <a href="{{ auth()->check() ? '#' : route('login') }}"
-                       class="block px-4 py-3 text-sm hover:bg-gray-100">
-                        Find Your Outfit
-                    </a>
+<a href="{{ auth()->check() ? route('find-outfit.index') : route('login') }}"
+   class="
+   {{ request()->routeIs('find-outfit.*')
+        ? 'text-green-600 border-b-2 border-green-500 pb-1'
+        : 'text-gray-600 hover:text-gray-900' }}">
+    Find Your Outfit
+</a>
+
+
 
                     <hr>
 
@@ -98,17 +109,89 @@
                         </a>
                     @endguest
 
-                    @auth
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button
-                                class="w-full text-left px-4 py-3 text-sm hover:bg-gray-100">
-                                Logout
-                            </button>
-                        </form>
-                    @endauth
+               @auth
+<div class="relative hidden md:block">
+    <button id="userMenuBtn"
+        class="flex items-center gap-2
+               border border-green-500 text-green-600
+               px-4 py-2 rounded-full text-sm font-medium">
+        {{ auth()->user()->name }}
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+
+    <div id="userMenu"
+        class="hidden absolute right-0 mt-2 w-44
+               bg-white border border-gray-200
+               rounded-xl shadow-lg overflow-hidden">
+
+        <form id="logoutDesktop" method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="button"
+                onclick="confirmLogout()"
+                class="w-full px-4 py-3 text-left
+                       text-sm font-medium text-red-600
+                       hover:bg-red-50 transition">
+                Logout
+            </button>
+        </form>
+    </div>
+</div>
+@endauth
+@auth
+<form method="POST" action="{{ route('logout') }}" class="md:hidden">
+    @csrf
+    <button
+        type="submit"
+        class="block w-full px-4 py-3
+               text-left text-sm font-medium
+               text-red-600 hover:bg-red-50">
+        Logout
+    </button>
+</form>
+@endauth
+
+
+
                 </div>
             </details>
         </div>
     </div>
 </nav>
+
+
+<script>
+const btn = document.getElementById('userMenuBtn');
+const menu = document.getElementById('userMenu');
+
+if (btn) {
+    btn.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!btn.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+}
+
+function confirmLogout() {
+    Swal.fire({
+        title: 'Logout?',
+        text: 'Kamu yakin ingin logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc2626'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('logoutDesktop').submit();
+        }
+    });
+}
+</script>
+

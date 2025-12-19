@@ -18,9 +18,7 @@ class OutfitController extends Controller
         $outfits = Outfit::with('category')
             ->where('user_id', Auth::id())
             ->when($request->category, function ($query) use ($request) {
-                $query->whereHas('category', function ($q) use ($request) {
-                    $q->where('name', $request->category);
-                });
+                $query->where('category_id', $request->category);
             })
             ->latest()
             ->get();
@@ -49,10 +47,12 @@ class OutfitController extends Controller
             'category_id' => $request->category_id,
             'image'       => $imagePath,
             'user_id'     => Auth::id(),
+            'type'        => 'daily',   // default user upload
+            'source'      => 'user',
         ]);
 
         return redirect()->route('outfits.index')
-            ->with('success', 'Outfit berhasil ditambahkan');
+            ->with('success', 'Item outfit berhasil ditambahkan');
     }
 
     public function edit(Outfit $outfit)
@@ -74,9 +74,7 @@ class OutfitController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($outfit->image) {
-                Storage::disk('public')->delete($outfit->image);
-            }
+            Storage::disk('public')->delete($outfit->image);
             $outfit->image = $request->file('image')->store('outfits', 'public');
         }
 
@@ -94,10 +92,7 @@ class OutfitController extends Controller
     {
         abort_if($outfit->user_id !== Auth::id(), 403);
 
-        if ($outfit->image) {
-            Storage::disk('public')->delete($outfit->image);
-        }
-
+        Storage::disk('public')->delete($outfit->image);
         $outfit->delete();
 
         return redirect()->route('outfits.index')

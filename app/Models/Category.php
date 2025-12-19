@@ -8,7 +8,8 @@ class Category extends Model
 {
     protected $fillable = [
         'name',
-        'is_active',
+        'role',
+        'is_active'
     ];
 
     public function outfits()
@@ -16,3 +17,4 @@ class Category extends Model
         return $this->hasMany(Outfit::class);
     }
 }
+

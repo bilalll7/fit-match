@@ -18,21 +18,30 @@
         </a>
     </div>
 
-    {{-- FILTER CATEGORY --}}
-    <div class="flex gap-3 flex-wrap mb-12">
-        <a href="{{ route('outfits.index') }}"
-           class="px-5 py-2 rounded-full
-           {{ request('category') ? 'bg-green-100' : 'bg-green-500 text-white' }}">
-            Semua
-        </a>
+{{-- FILTER CATEGORY --}}
+<div class="flex gap-3 flex-wrap mb-12">
 
-        @foreach($categories as $category)
-            <a href="{{ route('outfits.index',['category'=>$category->name]) }}"
-               class="px-5 py-2 rounded-full bg-green-100 hover:bg-green-200">
-                {{ $category->name }}
-            </a>
-        @endforeach
-    </div>
+    {{-- SEMUA --}}
+    <a href="{{ route('outfits.index') }}"
+       class="px-5 py-2 rounded-full transition
+       {{ request('category') ? 'bg-green-100 text-green-700' : 'bg-green-500 text-white' }}">
+        Semua
+    </a>
+
+    {{-- CATEGORY --}}
+    @foreach($categories as $category)
+        <a href="{{ route('outfits.index', ['category' => $category->id]) }}"
+           class="px-5 py-2 rounded-full transition
+           {{ request('category') == $category->id
+                ? 'bg-green-500 text-white'
+                : 'bg-green-100 text-green-700 hover:bg-green-200' }}">
+            {{ $category->name }}
+        </a>
+    @endforeach
+
+</div>
+
+
 
     {{-- OUTFITS GRID --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -57,14 +66,17 @@
                             Edit
                         </a>
 
-                        <form action="{{ route('outfits.destroy',$outfit) }}"
-                              method="POST"
-                              onsubmit="return confirm('Hapus outfit ini?')">
+                       <form id="delete-form-{{ $outfit->id }}"
+                            action="{{ route('outfits.destroy',$outfit) }}"
+                            method="POST">
                             @csrf @method('DELETE')
-                            <button class="text-red-500">
+                            <button type="button"
+                                    onclick="confirmDelete({{ $outfit->id }})"
+                                    class="text-red-500">
                                 Hapus
                             </button>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -76,3 +88,35 @@
     </div>
 </div>
 @endsection
+
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil',
+    text: '{{ session('success') }}',
+    timer: 2000,
+    showConfirmButton: false
+});
+</script>
+@endif
+
+@push('scripts')
+<script>
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Hapus Outfit?',
+        text: 'Data yang dihapus tidak bisa dikembalikan',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc2626',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+</script>
+@endpush

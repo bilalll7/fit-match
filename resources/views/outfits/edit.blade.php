@@ -5,10 +5,12 @@
 
     <h1 class="text-2xl font-semibold mb-6">Edit Outfit</h1>
 
-    <form method="POST"
-          action="{{ route('outfits.update',$outfit) }}"
-          enctype="multipart/form-data"
-          class="bg-white p-6 rounded-2xl shadow space-y-5">
+<form id="updateForm"
+      method="POST"
+      action="{{ route('outfits.update',$outfit) }}"
+      enctype="multipart/form-data"
+      class="bg-white p-6 rounded-2xl shadow space-y-5">
+
         @csrf @method('PUT')
 
         <div>
@@ -40,9 +42,32 @@
         <img src="{{ asset('storage/'.$outfit->image) }}"
              class="h-40 rounded mt-3">
 
-        <button class="w-full bg-green-500 text-white py-3 rounded-full">
-            Update Outfit
-        </button>
+            <button type="button"
+                    onclick="confirmUpdate()"
+                    class="w-full bg-green-500 text-white py-3 rounded-full">
+                Update Outfit
+            </button>
+
     </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function confirmUpdate() {
+    Swal.fire({
+        title: 'Update Outfit?',
+        text: 'Perubahan akan disimpan',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Update',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#16a34a',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('updateForm').submit();
+        }
+    });
+}
+</script>
+@endpush

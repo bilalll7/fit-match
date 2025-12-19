@@ -5,7 +5,7 @@
     <div class="w-full max-w-md bg-white p-8 rounded-xl shadow">
         <h2 class="text-2xl font-bold text-center mb-6">Register FitMatch</h2>
 
-        <form method="POST" action="{{ route('register') }}" class="space-y-4">
+        <form id="registerForm" method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf
 
             <input type="text" name="name" placeholder="Nama"
@@ -20,9 +20,12 @@
             <input type="password" name="password_confirmation" placeholder="Konfirmasi Password"
                 class="w-full px-4 py-2 border rounded-lg" required>
 
-            <button class="w-full bg-black text-white py-2 rounded-lg">
-                Register
-            </button>
+        <button type="button"
+            onclick="confirmRegister()"
+            class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+            Register
+        </button>
+
         </form>
 
         <p class="text-center text-sm mt-4">
@@ -32,3 +35,22 @@
     </div>
 </div>
 @endsection
+
+<script>
+function confirmRegister() {
+    Swal.fire({
+        title: 'Konfirmasi Pendaftaran',
+        text: 'Apakah data yang kamu masukkan sudah benar?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Daftar',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#16a34a',
+        cancelButtonColor: '#6b7280'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('registerForm').submit();
+        }
+    });
+}
+</script>
