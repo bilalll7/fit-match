@@ -23,7 +23,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\StyleController;
 use App\Http\Controllers\Admin\TrendController;
-
+use App\Http\Controllers\Admin\TrendTikTokController;
 
 /* =======================
 |  PUBLIC
@@ -111,4 +111,19 @@ Route::prefix('admin')
             // Tambahkan route toggle
     Route::patch('trends/{trend}/toggle', [TrendController::class, 'toggle'])
          ->name('trends.toggle');
+Route::resource('trends', TrendController::class);
+
+
+
+// TikTok routes
+Route::post('trends/{trend}/tiktoks', [TrendTikTokController::class, 'store'])
+    ->name('trends.tiktoks.store');
+
+// Hapus TikTok langsung dengan ID TikTok, tidak perlu trend parameter
+Route::delete('tiktoks/{tiktok}', [TrendTikTokController::class, 'destroy'])
+    ->name('trends.tiktoks.destroy');
+
+
+
+
     });

@@ -19,27 +19,29 @@ class TrendController extends Controller
         return view('admin.trends.create');
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title'       => 'required',
-            'description' => 'required',
-            'image'       => 'required|image'
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'title'       => 'required',
+        'description' => 'required',
+        'image'       => 'required|image'
+    ]);
 
-        $image = $request->file('image')->store('trends', 'public');
+    $image = $request->file('image')->store('trends', 'public');
 
-        $trend = Trend::create([
-            'title'       => $request->title,
-            'description' => $request->description,
-            'cover_image' => $image, // ubah dari 'image' menjadi 'cover_image'
-            'is_active'   => true
-        ]);
+    Trend::create([
+        'title'       => $request->title,
+        'description' => $request->description,
+        'cover_image' => $image,
+        'is_active'   => true
+    ]);
 
-        return redirect()
-            ->route('admin.trends.index', $trend)
-            ->with('success', 'Trend berhasil dibuat');
-    }
+    return redirect()->route('admin.trends.index')
+                     ->with('success', 'Trend berhasil dibuat');
+}
+
+
+
 
     public function edit(Trend $trend)
     {
