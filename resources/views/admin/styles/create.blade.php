@@ -2,136 +2,57 @@
 
 @section('content')
 
-{{-- FONT + SWEETALERT + ALPINE --}}
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<div class="max-w-2xl mx-auto">
+    <div class="mb-8">
+        <a href="{{ route('admin.styles.index') }}" class="text-neutral-400 hover:text-neutral-900 text-sm mb-4 inline-block">&larr; Back to Styles</a>
+        <h1 class="text-3xl font-black text-neutral-900">Add New Style</h1>
+    </div>
 
-<style>
-    * { font-family: 'Poppins', sans-serif; }
-</style>
+    <div class="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-neutral-100 p-8">
+        <form method="POST" action="{{ route('admin.styles.store') }}" enctype="multipart/form-data" class="space-y-6">
+            @csrf
 
-{{-- HEADER --}}
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-emerald-600">
-        Tambah Style
-    </h1>
-    <p class="text-gray-500 text-sm">
-        Tambahkan style baru untuk rekomendasi outfit FitMatch
-    </p>
+            {{-- Nama --}}
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Style Name</label>
+                <input type="text" name="name" required placeholder="e.g. Streetwear"
+                    class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-black transition">
+            </div>
+
+            {{-- Deskripsi --}}
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Description</label>
+                <textarea name="description" rows="4" required placeholder="Describe the aesthetic..."
+                    class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-black transition"></textarea>
+            </div>
+
+            {{-- Upload --}}
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Cover Image</label>
+                <input type="file" name="image"
+                    class="block w-full text-sm text-neutral-500
+                    file:mr-4 file:py-2.5 file:px-4
+                    file:rounded-xl file:border-0
+                    file:text-xs file:font-bold
+                    file:bg-neutral-900 file:text-white
+                    hover:file:bg-black transition">
+            </div>
+
+            {{-- Checkbox --}}
+            <div class="flex items-center gap-3 pt-2">
+                <input type="checkbox" name="is_active" id="is_active" checked
+                    class="w-5 h-5 text-black border-neutral-300 rounded focus:ring-black">
+                <label for="is_active" class="text-sm font-medium text-neutral-700">Set as Active</label>
+            </div>
+
+            {{-- Buttons --}}
+            <div class="pt-6 flex gap-4">
+                <button type="submit" class="flex-1 bg-neutral-900 text-white font-bold py-3 rounded-xl hover:bg-black transition shadow-lg">
+                    Save Style
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
-
-{{-- CARD --}}
-<form
-    method="POST"
-    action="{{ route('admin.styles.store') }}"
-    enctype="multipart/form-data"
-    x-data="{ loading: false }"
-    @submit.prevent="
-        loading = true;
-        Swal.fire({
-            title: 'Menyimpan Data',
-            text: 'Mohon tunggu sebentar...',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-        $el.submit();
-    "
-    class="max-w-4xl bg-white rounded-3xl shadow-xl p-8 space-y-6"
->
-    @csrf
-
-    {{-- NAMA STYLE --}}
-    <div>
-        <label class="block text-sm font-semibold text-gray-600 mb-2">
-            Nama Style
-        </label>
-        <input
-            type="text"
-            name="name"
-            required
-            placeholder="Contoh: Streetwear, Casual, Formal"
-            class="w-full px-4 py-3 rounded-xl
-                   border border-gray-200
-                   focus:outline-none
-                   focus:ring-4 focus:ring-emerald-200
-                   transition"
-        >
-    </div>
-
-    {{-- DESKRIPSI --}}
-    <div>
-        <label class="block text-sm font-semibold text-gray-600 mb-2">
-            Deskripsi Style
-        </label>
-        <textarea
-            name="description"
-            rows="4"
-            required
-            placeholder="Deskripsikan karakter style ini..."
-            class="w-full px-4 py-3 rounded-xl
-                   border border-gray-200
-                   focus:outline-none
-                   focus:ring-4 focus:ring-emerald-200
-                   transition"></textarea>
-    </div>
-
-    {{-- UPLOAD GAMBAR --}}
-    <div>
-        <label class="block text-sm font-semibold text-gray-600 mb-2">
-            Gambar Style
-        </label>
-        <input
-            type="file"
-            name="image"
-            class="w-full px-4 py-3 rounded-xl
-                   border border-gray-200
-                   bg-gray-50
-                   focus:outline-none"
-        >
-    </div>
-
-    {{-- STATUS --}}
-    <div class="flex items-center gap-3">
-        <input
-            type="checkbox"
-            name="is_active"
-            checked
-            class="w-5 h-5 accent-emerald-500"
-        >
-        <span class="text-sm text-gray-600">
-            Aktifkan style ini
-        </span>
-    </div>
-
-    {{-- ACTION --}}
-    <div class="flex justify-end gap-4 pt-4">
-        <a
-            href="{{ route('admin.styles.index') }}"
-            class="px-6 py-3 rounded-xl
-                   border border-gray-300
-                   text-gray-600
-                   hover:bg-gray-100 transition"
-        >
-            Batal
-        </a>
-
-        <button
-            type="submit"
-            :disabled="loading"
-            class="px-8 py-3 rounded-xl text-white font-semibold
-                   bg-gradient-to-r from-emerald-400 to-green-500
-                   hover:from-emerald-500 hover:to-green-600
-                   shadow-lg hover:shadow-xl
-                   transition
-                   disabled:opacity-60
-                   disabled:cursor-not-allowed"
-        >
-            <span x-show="!loading">Simpan Style</span>
-            <span x-show="loading">Menyimpan...</span>
-        </button>
-    </div>
-
-</form>
 
 @endsection

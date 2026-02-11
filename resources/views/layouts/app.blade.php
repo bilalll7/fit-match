@@ -43,6 +43,7 @@ class="pt-20"
 >
     @yield('content')
 </main>
+@include('partials.footer')
 
 
 

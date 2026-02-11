@@ -1,28 +1,40 @@
-<section class="min-h-[calc(100vh-5rem)] flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100">
-    <div class="text-center max-w-3xl px-4">
+<section class="relative pt-28 pb-16 md:pt-36 md:pb-32 bg-white overflow-hidden">
+    {{-- Background Pattern (Grid Halus) --}}
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#f5f5f5_1px,transparent_1px),linear-gradient(to_bottom,#f5f5f5_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
-        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-xs md:text-sm mb-6">
-            ✨ Your Personal Outfit Curator
-        </span>
+    <div class="relative max-w-7xl mx-auto px-6 text-center z-10">
+        
+        {{-- Badge Kecil --}}
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-200 bg-white mb-6 md:mb-8 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-black relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neutral-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
+            </span>
+            <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-600">Personal Outfit Curator</span>
+        </div>
 
-        <h1 class="text-4xl md:text-6xl font-serif font-semibold text-gray-900 mb-6">
-            Temukan Gaya
+        {{-- Headline Besar --}}
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-neutral-900 mb-6 leading-[0.9]">
+            DEFINE YOUR <br class="hidden md:block" />
+            <span class="text-neutral-400">SIGNATURE</span> LOOK.
         </h1>
 
-        <p class="text-gray-600 text-base md:text-lg mb-10">
-            Kelola koleksi pakaianmu dan dapatkan rekomendasi outfit yang sempurna
-            untuk setiap kesempatan
+        {{-- Subheadline --}}
+        <p class="text-base md:text-lg text-neutral-600 max-w-xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium">
+            Kelola lemari digitalmu. Dapatkan kurasi outfit harian berbasis AI. 
+            Tampil percaya diri tanpa pusing memilih.
         </p>
 
-        <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-6">
+        {{-- Buttons (CTA) --}}
+        <div class="flex flex-col sm:flex-row justify-center gap-3 md:gap-4">
             <a href="{{ auth()->check() ? route('outfits.index') : route('login') }}"
-               class="px-8 py-4 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-medium shadow-lg">
-                Find Your Outfit →
+               class="px-8 py-3.5 rounded-lg bg-neutral-900 text-white font-semibold text-sm md:text-base hover:bg-black hover:-translate-y-1 transition-all duration-300 shadow-xl shadow-neutral-200">
+               Generate Outfit
             </a>
 
             <a href="{{ auth()->check() ? route('outfits.create') : route('login') }}"
-               class="px-8 py-4 rounded-full border-2 border-green-400 text-green-600 font-medium">
-                Upload Outfitmu
+               class="px-8 py-3.5 rounded-lg border border-neutral-200 bg-white text-neutral-900 font-semibold text-sm md:text-base hover:bg-neutral-50 hover:border-neutral-300 transition-all duration-300">
+                Upload Collection
             </a>
         </div>
     </div>

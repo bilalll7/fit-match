@@ -1,197 +1,70 @@
-<nav class="fixed top-0 left-0 w-full h-20 bg-white border-b z-50">
+<nav class="fixed top-0 left-0 w-full h-20 bg-white/80 backdrop-blur-md border-b border-neutral-200 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-
-        {{-- LOGO --}}
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+        {{-- LOGO (Minimalist) --}}
+        <a href="{{ route('home') }}" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 bg-black text-white flex items-center justify-center font-bold text-sm tracking-tighter rounded-md group-hover:rotate-3 transition-transform">
                 OuT
             </div>
-            <span class="font-semibold text-lg">FitMatch</span>
-        </div>
+            <span class="font-bold text-xl tracking-tight text-neutral-900">FitMatch.</span>
+        </a>
 
         {{-- DESKTOP MENU --}}
-        <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <div class="hidden md:flex items-center gap-10 text-sm font-medium text-neutral-600">
             <a href="{{ route('home') }}"
-               class="{{ request()->routeIs('home') ? 'text-green-600' : 'text-gray-600 hover:text-gray-900' }}">
+               class="hover:text-black transition-colors {{ request()->routeIs('home') ? 'text-black font-semibold' : '' }}">
                 Dashboard
             </a>
 
             <a href="{{ auth()->check() ? route('outfits.index') : route('login') }}"
-               class="text-gray-600 hover:text-gray-900">
-                Match Your Outfit
+               class="hover:text-black transition-colors">
+                Collection
             </a>
 
-<a href="{{ auth()->check() ? route('find-outfit.index') : route('login') }}"
-   class="{{ request()->routeIs('find-outfit.*')
-        ? 'text-green-600 border-b-2 border-green-500 pb-1'
-        : 'text-gray-600 hover:text-gray-900' }}">
-    Find Your Outfit
-</a>
-
-
+            <a href="{{ auth()->check() ? route('find-outfit.index') : route('login') }}"
+               class="hover:text-black transition-colors {{ request()->routeIs('find-outfit.*') ? 'text-black font-semibold' : '' }}">
+                Generate Fit
+            </a>
         </div>
 
         {{-- RIGHT SIDE --}}
-        <div class="flex items-center gap-3">
-
-            {{-- DESKTOP AUTH --}}
+        <div class="flex items-center gap-4">
             @guest
                 <a href="{{ route('login') }}"
-                   class="hidden md:inline border border-green-500 text-green-600 px-4 py-2 rounded-full text-sm">
-                    Login
+                   class="hidden md:inline-block text-sm font-medium text-neutral-600 hover:text-black transition">
+                    Log In
+                </a>
+                <a href="{{ route('register') }}"
+                   class="hidden md:inline-block bg-black text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-neutral-800 transition">
+                    Get Started
                 </a>
             @endguest
 
-@auth
-    <details class="hidden md:block relative">
-        <summary
-            class="list-none cursor-pointer flex items-center gap-2 border border-green-500 text-green-600 px-4 py-2 rounded-full text-sm">
-            <span>{{ auth()->user()->name }}</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 9l-7 7-7-7"/>
-            </svg>
-        </summary>
+            @auth
+                <div class="relative hidden md:block group">
+                    <button class="flex items-center gap-2 text-sm font-medium hover:opacity-70 transition">
+                        <span>{{ auth()->user()->name }}</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
 
-        <div class="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
-            <form id="logoutForm" method="POST" action="{{ route('logout') }}">
-                @csrf
-
-                <button type="button"
-                    onclick="confirmLogout()"
-                    class="w-full text-left px-4 py-3 text-red-600 hover:text-red-700">
-                    Logout
-                </button>
-            </form>
-
-        </div>
-    </details>
-@endauth
-
-
-            {{-- MOBILE MENU --}}
-            <details class="md:hidden relative">
-                <summary class="list-none cursor-pointer">
-                    <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </summary>
-
-                <div class="absolute right-0 mt-3 w-52 bg-white border rounded-xl shadow-lg">
-                    <a href="{{ route('home') }}"
-                       class="block px-4 py-3 text-sm hover:bg-gray-100">
-                        Dashboard
-                    </a>
-
-                    <a href="{{ auth()->check() ? route('outfits.index') : route('login') }}"
-                       class="block px-4 py-3 text-sm hover:bg-gray-100">
-                        Match Your Outfit
-                    </a>
-
-<a href="{{ auth()->check() ? route('find-outfit.index') : route('login') }}"
-   class="
-   {{ request()->routeIs('find-outfit.*')
-        ? 'text-green-600 border-b-2 border-green-500 pb-1'
-        : 'text-gray-600 hover:text-gray-900' }}">
-    Find Your Outfit
-</a>
-
-
-
-                    <hr>
-
-                    @guest
-                        <a href="{{ route('login') }}"
-                           class="block px-4 py-3 text-sm text-green-600 hover:bg-gray-100">
-                            Login
-                        </a>
-                    @endguest
-
-               @auth
-<div class="relative hidden md:block">
-    <button id="userMenuBtn"
-        class="flex items-center gap-2
-               border border-green-500 text-green-600
-               px-4 py-2 rounded-full text-sm font-medium">
-        {{ auth()->user()->name }}
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 9l-7 7-7-7"/>
-        </svg>
-    </button>
-
-    <div id="userMenu"
-        class="hidden absolute right-0 mt-2 w-44
-               bg-white border border-gray-200
-               rounded-xl shadow-lg overflow-hidden">
-
-        <form id="logoutDesktop" method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="button"
-                onclick="confirmLogout()"
-                class="w-full px-4 py-3 text-left
-                       text-sm font-medium text-red-600
-                       hover:bg-red-50 transition">
-                Logout
-            </button>
-        </form>
-    </div>
-</div>
-@endauth
-@auth
-<form method="POST" action="{{ route('logout') }}" class="md:hidden">
-    @csrf
-    <button
-        type="submit"
-        class="block w-full px-4 py-3
-               text-left text-sm font-medium
-               text-red-600 hover:bg-red-50">
-        Logout
-    </button>
-</form>
-@endauth
-
-
-
+                    {{-- Dropdown Minimalis --}}
+                    <div class="absolute right-0 top-full mt-2 w-48 bg-white border border-neutral-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                        <div class="py-1">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-neutral-600 hover:bg-neutral-50 hover:text-black">
+                                    Sign Out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </details>
+            @endauth
+
+            {{-- Mobile Menu Button (Hamburger) --}}
+            <button class="md:hidden p-2 text-neutral-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
         </div>
     </div>
 </nav>
-
-
-<script>
-const btn = document.getElementById('userMenuBtn');
-const menu = document.getElementById('userMenu');
-
-if (btn) {
-    btn.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!btn.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add('hidden');
-        }
-    });
-}
-
-function confirmLogout() {
-    Swal.fire({
-        title: 'Logout?',
-        text: 'Kamu yakin ingin logout?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#dc2626'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('logoutDesktop').submit();
-        }
-    });
-}
-</script>
-

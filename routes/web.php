@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\StyleController;
 use App\Http\Controllers\Admin\TrendController;
 use App\Http\Controllers\Admin\TrendTikTokController;
+use Illuminate\Support\Facades\Http;
 
 /* =======================
 |  PUBLIC
@@ -82,7 +83,13 @@ Route::middleware('auth')->group(function () {
             // TREND (USER VIEW)
             Route::get('/trend', [UserTrendController::class, 'index'])
                 ->name('trend');
-        });
+
+            Route::get('/trend/{trend}', [UserTrendController::class, 'show'])
+                ->name('trend.show');
+
+            Route::post('/trend/{trend}/generate', [UserTrendController::class, 'generate'])
+                ->name('trend.generate');
+                    });
 });
 
 

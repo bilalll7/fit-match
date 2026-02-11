@@ -1,20 +1,15 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<div class="p-8">
 
     {{-- HEADER --}}
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">
-            Tambah Trend
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">
-            Tambahkan trend outfit terbaru
-        </p>
+    <div class="mb-8">
+        <h1 class="text-3xl font-black text-neutral-900 tracking-tight">Tambah Trend Baru</h1>
+        <p class="text-neutral-500 mt-1 text-sm">Mulai buat koleksi trend outfit viral.</p>
     </div>
 
-    {{-- CARD FORM --}}
-    <div class="bg-white rounded-2xl shadow-md p-8 max-w-2xl">
+    {{-- FORM CARD --}}
+    <div class="bg-white p-8 rounded-3xl border border-neutral-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] max-w-2xl">
 
         <form method="POST"
               action="{{ route('admin.trends.store') }}"
@@ -24,55 +19,40 @@
             @csrf
 
             {{-- JUDUL --}}
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Judul Trend
-                </label>
-                <input type="text"
-                       name="title"
-                       placeholder="Masukkan judul trend"
-                       class="w-full border border-gray-300 px-4 py-3 rounded-xl
-                              focus:outline-none focus:ring-2 focus:ring-green-400">
+            <div class="group">
+                <label class="block text-sm font-bold text-neutral-900 mb-2">Judul Trend</label>
+                <input type="text" name="title" placeholder="Contoh: Y2K Style, Old Money..."
+                       class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-5 py-3 text-neutral-900 font-medium focus:bg-white focus:ring-2 focus:ring-neutral-900 focus:outline-none transition">
             </div>
 
             {{-- DESKRIPSI --}}
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Deskripsi Trend
-                </label>
-                <textarea name="description"
-                          rows="4"
-                          placeholder="Masukkan deskripsi trend"
-                          class="w-full border border-gray-300 px-4 py-3 rounded-xl
-                                 focus:outline-none focus:ring-2 focus:ring-green-400"></textarea>
+            <div class="group">
+                <label class="block text-sm font-bold text-neutral-900 mb-2">Deskripsi</label>
+                <textarea name="description" rows="4" placeholder="Jelaskan detail trend ini..."
+                          class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-5 py-3 text-neutral-900 font-medium focus:bg-white focus:ring-2 focus:ring-neutral-900 focus:outline-none transition"></textarea>
             </div>
 
             {{-- GAMBAR --}}
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Gambar Trend
-                </label>
-                <input type="file"
-                       name="image"
-                       class="w-full border border-dashed border-gray-300 p-3 rounded-xl
-                              bg-gray-50 cursor-pointer">
+            <div class="group">
+                <label class="block text-sm font-bold text-neutral-900 mb-2">Cover Image</label>
+                <input type="file" name="image"
+                       class="w-full border border-dashed border-neutral-300 p-4 rounded-xl bg-neutral-50 text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-900 file:text-white hover:file:bg-neutral-700 cursor-pointer">
             </div>
 
             {{-- ACTION --}}
-            <div class="flex justify-end gap-3 pt-4">
+            <div class="flex justify-end gap-3 pt-6 border-t border-neutral-100">
                 <a href="{{ route('admin.trends.index') }}"
-                   class="px-6 py-3 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-100">
+                   class="px-6 py-3 rounded-xl border border-neutral-200 text-neutral-600 font-bold text-sm hover:bg-neutral-50 transition">
                     Batal
                 </a>
 
                 <button type="submit"
-                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-3
-                               rounded-xl font-semibold shadow transition">
+                        class="bg-neutral-900 hover:bg-neutral-800 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg transition transform hover:scale-[1.02]">
                     Simpan Trend
                 </button>
             </div>
 
         </form>
     </div>
-</div>
+
 @endsection

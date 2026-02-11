@@ -1,182 +1,173 @@
 <?php
+
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Outfit;
-use App\Models\OutfitItem;
-use App\Models\Recommendation;
+use App\Services\GeminiService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
- use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
-
 
 class FindOutfitController extends Controller
 {
-public function index()
-{
-    $days = [
-        'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'
-    ];
+    protected $geminiService;
 
-    return view('find-outfit.index', compact('days'));
-}
-
-
-
-public function daily()
-{
-    $days = [
-        'Senin', 'Selasa', 'Rabu',
-        'Kamis', 'Jumat', 'Sabtu', 'Minggu'
-    ];
-
-    $roles = Category::where('is_active', true)
-        ->pluck('role')
-        ->unique();
-
-    $weeklyOutfits = [];
-
-    foreach ($days as $day) {
-
-        $items = [];
-
-        foreach ($roles as $role) {
-            $item = Outfit::where('user_id', Auth::id())
-                ->whereHas('category', fn ($q) => $q->where('role', $role))
-                ->inRandomOrder()
-                ->first();
-
-            if ($item) {
-                $items[] = $item;
-            }
-        }
-
-        $weeklyOutfits[] = [
-            'day'   => $day,
-            'items' => $items
-        ];
-    }
-
-    return view('find-outfit.daily', compact('weeklyOutfits'));
-}
-
-
-
-public function event()
-{
-    $events = [
-        'hari_raya' => 'Hari Raya',
-        'kondangan' => 'Kondangan',
-        'date'      => 'Date',
-        'hangout'   => 'Hangout',
-        'formal'    => 'Formal'
-    ];
-
-    return view('find-outfit.event', compact('events'));
-}
-
-
-    public function trend()
+    public function __construct(GeminiService $geminiService)
     {
-        $recommendations = Recommendation::with('items')
-            ->where('type', 'trend')
-            ->get();
-
-        return view('find-outfit.trend', compact('recommendations'));
+        $this->geminiService = $geminiService;
     }
+
+    public function index()
+    {
+        $days = [
+            'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'
+        ];
+
+        return view('find-outfit.index', compact('days'));
+    }
+
+    public function event()
+    {
+        $events = [
+            'hari_raya' => 'Hari Raya',
+            'kondangan' => 'Kondangan',
+            'date'      => 'Date',
+            'hangout'   => 'Hangout',
+            'formal'    => 'Formal'
+        ];
+
+        return view('find-outfit.event', compact('events'));
+    }
+
+   /**
+ * Generate outfit dengan AI berdasarkan aktivitas
+ */
+/**
+ * Generate outfit dengan AI berdasarkan aktivitas
+ */
 public function generate(Request $request)
 {
     $request->validate([
-        'day' => 'required'
+        'activity' => 'required',
+        'custom_activity' => 'required_if:activity,custom|nullable|string|max:500'
     ]);
 
     $userId = Auth::id();
 
-    // ambil semua kategori aktif
-    $categories = Category::where('is_active', true)->get();
+    // Auto-detect hari ini
+    $today = Carbon::now();
+    $dayName = $today->locale('id')->translatedFormat('l'); // Senin, Selasa, etc
+    $fullDate = $today->locale('id')->translatedFormat('l, d F Y'); // Senin, 12 Februari 2025
 
-    if ($categories->isEmpty()) {
-        return back()->with('error', 'Belum ada kategori aktif dari admin');
+    // Determine activity (use custom if selected)
+    $activity = $request->activity === 'custom' 
+        ? $request->custom_activity 
+        : $request->activity;
+
+    // Ambil SEMUA outfit user
+    $allOutfits = Outfit::with('category')
+        ->where('user_id', $userId)
+        ->get();
+
+    if ($allOutfits->isEmpty()) {
+        return back()->with('error', 'Kamu belum punya outfit. Upload dulu ya!');
     }
 
-    $outfits = [];
+    // Call Gemini AI dengan context aktivitas + hari
+    $aiRecommendation = $this->geminiService->generateSmartOutfit(
+        $allOutfits, 
+        $dayName, 
+        $activity
+    );
 
-    foreach ($categories as $category) {
+    // Get outfit items
+    $selectedOutfits = $this->getSelectedOutfits($aiRecommendation['selected_items']);
 
-        $item = Outfit::where('user_id', $userId)
-            ->where('category_id', $category->id)
-            ->inRandomOrder()
-            ->first();
-
-        if (!$item) {
-            return back()->with(
-                'error',
-                "Outfit kategori {$category->name} belum lengkap"
-            );
-        }
-
-        $outfits[] = $item;
+    if ($selectedOutfits->isEmpty()) {
+        return back()->with('error', 'Tidak bisa generate outfit. Coba lagi!');
     }
+
+    // Format activity untuk display
+    $activityDisplay = $this->formatActivityDisplay($request->activity, $request->custom_activity);
 
     return view('find-outfit.result', [
-        'day'     => $request->day,
-        'outfits' => $outfits
+        'day' => $dayName,
+        'fullDate' => $fullDate,
+        'activity' => $activityDisplay,
+        'outfits' => $selectedOutfits,
+        'ai_reasoning' => $aiRecommendation['reasoning'] ?? null
     ]);
 }
 
-public function generateEvent(Request $request)
+/**
+ * Format activity untuk display
+ */
+private function formatActivityDisplay($activity, $customActivity = null): string
 {
-    $request->validate([
-        'event' => 'required'
-    ]);
+    if ($activity === 'custom') {
+        return $customActivity;
+    }
 
-    $userId = Auth::id();
-
-    $eventStyles = [
-        'hari_raya' => ['Formal', 'Muslim', 'Elegant'],
-        'kondangan' => ['Formal', 'Elegant'],
-        'date'      => ['Casual', 'Smart Casual'],
-        'hangout'   => ['Casual'],
-        'formal'    => ['Formal']
+    $activityLabels = [
+        'kerja_kuliah' => 'Kerja / Kuliah',
+        'santai' => 'Santai di Rumah',
+        'hangout' => 'Hangout Bareng Teman',
+        'formal' => 'Acara Formal',
+        'kencan' => 'Kencan',
+        'kondangan' => 'Kondangan / Wedding',
+        'ibadah' => 'Ibadah / Hari Raya'
     ];
 
-    $styles = $eventStyles[$request->event] ?? [];
+    return $activityLabels[$activity] ?? $activity;
+}
+    /**
+     * Generate EVENT outfit dengan AI
+     */
+    public function generateEvent(Request $request)
+    {
+        $request->validate([
+            'event' => 'required'
+        ]);
 
-    // Ambil category aktif (DINAMIS)
-    $categories = Category::where('is_active', true)->get();
+        $userId = Auth::id();
 
-    $outfits = [];
+        // Ambil SEMUA outfit user
+        $allOutfits = Outfit::with('category')
+            ->where('user_id', $userId)
+            ->get();
 
-    foreach ($categories as $category) {
-
-        $query = Outfit::where('user_id', $userId)
-            ->where('category_id', $category->id);
-
-        // OPTIONAL: filter style kalau ada kolom style
-        if (!empty($styles) && Schema::hasColumn('outfits', 'style')) {
-            $query->whereIn('style', $styles);
+        if ($allOutfits->isEmpty()) {
+            return back()->with('error', 'Kamu belum punya outfit. Upload dulu ya!');
         }
 
-        $item = $query->inRandomOrder()->first();
+        // Call Gemini AI
+        $aiRecommendation = $this->geminiService->generateEventOutfit($allOutfits, $request->event);
 
-        if ($item) {
-            $outfits[] = $item;
+        // Get outfit items
+        $selectedOutfits = $this->getSelectedOutfits($aiRecommendation['selected_items']);
+
+        if ($selectedOutfits->isEmpty()) {
+            return back()->with('error', 'Tidak bisa generate outfit untuk event ini. Coba lagi!');
         }
+
+        return view('find-outfit.event-result', [
+            'event' => $request->event,
+            'outfits' => $selectedOutfits,
+            'ai_tips' => $aiRecommendation['reasoning'] ?? null
+        ]);
     }
 
-    if (count($outfits) === 0) {
-        return back()->with('error', 'Outfit belum cukup untuk event ini');
+    /**
+     * Helper: Get outfit objects from AI selected IDs
+     */
+    private function getSelectedOutfits(array $selectedIds): \Illuminate\Support\Collection
+    {
+        $outfitIds = array_filter($selectedIds, fn($id) => $id !== null);
+
+        return Outfit::with('category')
+            ->whereIn('id', $outfitIds)
+            ->get();
     }
-
-    return view('find-outfit.event-result', [
-        'event'   => $request->event,
-        'outfits' => $outfits
-    ]);
 }
-
-
-}
-
-

@@ -2,121 +2,100 @@
 
 @section('content')
 
-{{-- HEADER --}}
-<div class="mb-8 flex items-center justify-between">
-    <div>
-        <h1 class="text-3xl font-bold text-emerald-600">
-            Tambah kategori
-        </h1>
+    {{-- HEADER --}}
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-neutral-900 tracking-tight">Tambah Kategori</h1>
+            <p class="text-neutral-500 mt-1 text-sm">Buat kategori baru untuk mengelompokkan outfit.</p>
+        </div>
         
+        <span class="px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase
+                     bg-neutral-100 text-neutral-600 border border-neutral-200">
+            Admin Area
+        </span>
     </div>
 
-    {{-- BADGE --}}
-    <span class="px-4 py-2 rounded-full text-sm font-medium
-                 bg-emerald-100 text-emerald-600">
-        Admin FitMatch
-    </span>
-</div>
+    {{-- FORM CARD --}}
+    <div class="bg-white p-8 rounded-3xl border border-neutral-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] max-w-2xl">
 
-{{-- GRID AGAR TIDAK KOSONG --}}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {{-- LIBRARY PENDUKUNG --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-   {{-- FORM KATEGORI + SWEETALERT --}}
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+        <form
+            method="POST"
+            action="{{ route('admin.categories.store') }}"
+            x-data="{ loading: false }"
+            @submit.prevent="
+                loading = true;
+                $el.submit();
+            "
+            class="space-y-6"
+        >
+            @csrf
 
-<style>
-    * { font-family: 'Poppins', sans-serif; }
-</style>
+            {{-- Nama Kategori --}}
+            <div class="group">
+                <label class="block text-sm font-bold text-neutral-900 mb-2">
+                    Nama Kategori
+                </label>
+                <input
+                    name="name"
+                    required
+                    placeholder="Contoh: Casual, Formal, Sporty"
+                    class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-5 py-3 
+                           text-neutral-900 font-medium focus:bg-white focus:ring-2 focus:ring-neutral-900 focus:border-transparent 
+                           transition duration-200 outline-none placeholder:text-neutral-400">
+            </div>
 
-{{-- ALERT SUCCESS (SETELAH REDIRECT) --}}
-@if (session('success'))
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil',
-            text: '{{ session('success') }}',
-            timer: 2500,
-            showConfirmButton: false,
-            showClass: { popup: 'animate_animated animate_zoomIn' },
-            hideClass: { popup: 'animate_animated animate_zoomOut' }
-        });
-    });
-</script>
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-@endif
+            {{-- Role Pakaian --}}
+            <div class="group">
+                <label class="block text-sm font-bold text-neutral-900 mb-2">
+                    Role Pakaian
+                </label>
+                <div class="relative">
+                    <select name="role"
+                            required
+                            class="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-5 py-3 
+                                   text-neutral-900 font-medium focus:bg-white focus:ring-2 focus:ring-neutral-900 focus:border-transparent 
+                                   transition duration-200 outline-none appearance-none cursor-pointer">
+                        <option value="">-- Pilih Posisi --</option>
+                        <option value="top">Atasan (Top)</option>
+                        <option value="bottom">Bawahan (Bottom)</option>
+                        <option value="outer">Outerwear</option>
+                        <option value="shoes">Sepatu (Shoes)</option>
+                        <option value="accessory">Aksesoris</option>
+                    </select>
+                    {{-- Chevron Icon --}}
+                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
 
-<form
-    method="POST"
-    action="{{ route('admin.categories.store') }}"
-    x-data="{ loading: false }"
-    @submit.prevent="
-        loading = true;
-        Swal.fire({
-            title: 'Menyimpan Kategori',
-            text: 'Mohon tunggu...',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-        $el.submit();
-    "
-    class="lg:col-span-2 bg-white rounded-3xl shadow-xl p-8 space-y-6"
->
-    @csrf
+            {{-- Action Buttons --}}
+            <div class="flex items-center gap-4 pt-4 border-t border-neutral-100">
+                <button
+                    type="submit"
+                    :disabled="loading"
+                    class="flex-1 bg-neutral-900 hover:bg-neutral-800 text-white px-6 py-3 rounded-xl font-bold text-sm 
+                           transition transform hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg">
+                    <span x-show="!loading">Simpan Data</span>
+                    <span x-show="loading" class="flex justify-center items-center gap-2">
+                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Menyimpan...
+                    </span>
+                </button>
 
-    <div>
-        <label class="block text-sm font-medium text-gray-600 mb-1">
-            Nama Kategori
-        </label>
-        <input
-            name="name"
-            required
-            placeholder="Masukkan nama kategori"
-            class="w-full border rounded-xl px-4 py-3
-                   focus:ring-2 focus:ring-green-400 focus:outline-none transition">
+                <a href="{{ route('admin.categories.index') }}"
+                   class="px-6 py-3 border border-neutral-200 rounded-xl font-bold text-sm text-neutral-600 hover:bg-neutral-50 transition">
+                    Batal
+                </a>
+            </div>
+        </form>
     </div>
-<div>
-    <label class="block text-sm font-medium text-gray-600 mb-1">
-        Role Pakaian
-    </label>
-
-    <select name="role"
-            required
-            class="w-full border rounded-xl px-4 py-3">
-        <option value="">-- Pilih Role --</option>
-        <option value="top">Atasan</option>
-        <option value="bottom">Bawahan</option>
-        <option value="outer">Outer</option>
-        <option value="shoes">Sepatu</option>
-        <option value="accessory">Aksesoris</option>
-    </select>
-</div>
-
-    <button
-        type="submit"
-        :disabled="loading"
-        class="w-full bg-green-600 hover:bg-green-700 transition
-               text-white px-6 py-3 rounded-xl font-medium
-               active:scale-95
-               disabled:opacity-60 disabled:cursor-not-allowed"
-    >
-        <span x-show="!loading">Simpan</span>
-        <span x-show="loading">Menyimpan...</span>
-    </button>
-</form>
-
-
-        
-
-       
-
-       
-        
-    </form>
-
-    
 
 @endsection
